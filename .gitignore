@@ -32,9 +32,21 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# test artifacts
+/playwright-report/
+/test-results/
+
+# local Supabase state
+/supabase/.branches/
+/supabase/.temp/
 
 # vercel
 .vercel
+
+# netlify
+.netlify
 
 # typescript
 *.tsbuildinfo

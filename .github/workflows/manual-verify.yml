@@ -1,0 +1,31 @@
+name: Manual verification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: manual-verify-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24.15.0
+          cache: npm
+
+      - name: Install exact dependencies
+        run: npm ci
+
+      - name: Run application verification
+        run: npm run verify
