@@ -29,7 +29,7 @@ export function CustomerDashboardView({
         <p className="text-brass text-xs font-bold tracking-[0.2em] uppercase">
           Private atelier room
         </p>
-        <h1 className="font-display mt-5 max-w-3xl text-5xl leading-[0.95] tracking-[-0.045em] sm:text-6xl">
+        <h1 className="workspace-title mt-5 max-w-3xl">
           Welcome back,{" "}
           <span className="text-parchment italic">
             {dashboard.displayName}.
@@ -76,7 +76,7 @@ export function CustomerDashboardView({
       </section>
 
       <section>
-        <div className="flex items-end justify-between gap-4">
+        <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-end sm:gap-4">
           <div>
             <p className="eyebrow">Atelier ledger</p>
             <h2 className="font-display mt-2 text-4xl">Recent movement</h2>

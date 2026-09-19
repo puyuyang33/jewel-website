@@ -224,6 +224,7 @@ export function DesignRequestForm({
             atelier will respond with questions or a versioned quote.
           </p>
           <Button
+            className="w-full sm:w-auto"
             type="submit"
             disabled={pending || (state.ok && Boolean(state.data))}
           >

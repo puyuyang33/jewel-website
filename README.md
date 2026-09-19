@@ -46,6 +46,8 @@ refunds, Dropbox OAuth, calendar integration, or native applications.
 - Next.js 16 App Router and React Server Components.
 - Strict TypeScript and Tailwind CSS.
 - Accessible Radix-based interaction primitives.
+- Touch-first responsive layouts for 320px phones, iPad portrait/landscape,
+  and desktop screens.
 - Supabase PostgreSQL, Auth, Realtime, Storage, and RLS.
 - Google OAuth through Supabase.
 - Stripe-hosted Checkout and signed webhooks.
@@ -66,7 +68,7 @@ See [Architecture](docs/architecture.md) and
 - npm 10 or newer.
 - Docker Desktop for local Supabase.
 - Supabase CLI, installed as a pinned project dependency.
-- Chromium for Playwright.
+- Chromium and WebKit for Playwright.
 - Stripe CLI for manual webhook smoke tests.
 
 ## Installation
@@ -74,7 +76,7 @@ See [Architecture](docs/architecture.md) and
 ```powershell
 npm ci
 Copy-Item .env.example .env.local
-npx playwright install chromium
+npx playwright install chromium webkit
 ```
 
 Enter the local Supabase values after starting the stack:
@@ -177,6 +179,7 @@ Useful commands:
 ```powershell
 npm run format
 npm run check:public-dependencies
+npm run check:manual-workflows
 npm run lint
 npm run typecheck
 npm test
@@ -194,8 +197,9 @@ npm run load:realtime
 ```
 
 `verify` requires no production credentials and runs formatting, lint, strict
-types, coverage, and a production build. `verify:full` additionally requires
-local Supabase and runs RLS and browser tests.
+types, manual-only workflow enforcement, public dependency provenance,
+coverage, and a production build. `verify:full` additionally requires local
+Supabase and runs RLS and browser tests.
 
 See [Testing](docs/testing.md).
 

@@ -28,10 +28,10 @@ export function SiteHeader() {
         >
           Skip to content
         </a>
-        <div className="page-shell flex min-h-20 items-center justify-between gap-8">
+        <div className="page-shell flex min-h-18 items-center justify-between gap-3 sm:min-h-20">
           <Logo />
           <nav
-            className="hidden items-center gap-7 lg:flex"
+            className="hidden items-center gap-7 xl:flex"
             aria-label="Primary navigation"
           >
             {navigation.map((item) => (
@@ -44,7 +44,7 @@ export function SiteHeader() {
               </Link>
             ))}
           </nav>
-          <div className="hidden items-center gap-3 sm:flex">
+          <div className="hidden items-center gap-3 md:flex">
             <Button asChild variant="ghost" size="sm">
               <Link href="/sign-in">Sign in</Link>
             </Button>

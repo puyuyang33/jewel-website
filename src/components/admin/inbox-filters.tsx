@@ -12,8 +12,8 @@ export function AdminInboxFilters({
   unreadOnly: boolean;
 }) {
   return (
-    <form className="border-ink/10 grid gap-3 rounded-2xl border bg-white/70 p-3 md:grid-cols-[1fr_auto_auto_auto] md:items-center">
-      <label className="relative">
+    <form className="border-ink/10 grid gap-3 rounded-2xl border bg-white/70 p-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_auto_auto_auto] lg:items-center">
+      <label className="relative sm:col-span-2 lg:col-span-1">
         <span className="sr-only">Search customer, subject, or request</span>
         <Search
           aria-hidden="true"
@@ -27,12 +27,12 @@ export function AdminInboxFilters({
           placeholder="Search customer, subject, or request"
         />
       </label>
-      <label>
+      <label className="min-w-0">
         <span className="sr-only">Conversation status</span>
         <select
           name="status"
           defaultValue={status}
-          className="border-ink/15 min-h-12 min-w-44 rounded-xl border bg-white px-4 text-sm font-semibold"
+          className="border-ink/15 min-h-12 w-full rounded-xl border bg-white px-4 text-base font-semibold sm:text-sm lg:min-w-44"
         >
           <option value="">All statuses</option>
           <option value="open">Open</option>
@@ -50,7 +50,7 @@ export function AdminInboxFilters({
         />
         Unread only
       </label>
-      <button className="bg-ink text-porcelain hover:bg-garnet min-h-12 rounded-full px-5 text-sm font-semibold">
+      <button className="bg-ink text-porcelain hover:bg-garnet min-h-12 w-full rounded-full px-5 text-sm font-semibold lg:w-auto">
         Apply
       </button>
     </form>

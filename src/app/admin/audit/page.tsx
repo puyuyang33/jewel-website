@@ -52,7 +52,38 @@ export default async function AdminAuditPage({
       />
       {log.items.length > 0 ? (
         <Card className="overflow-hidden">
-          <div className="overflow-x-auto">
+          <ul
+            className="divide-ink/10 divide-y md:hidden"
+            aria-label="Audit events"
+          >
+            {log.items.map((entry) => (
+              <li key={entry.id} className="grid gap-4 p-5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="bg-parchment text-garnet rounded-full px-3 py-1 text-xs font-bold tracking-[0.08em] uppercase">
+                    {entry.action}
+                  </span>
+                  <time className="text-stone text-xs">
+                    {formatDate(entry.occurredAt)}
+                  </time>
+                </div>
+                <dl className="grid gap-3 text-sm">
+                  <div>
+                    <dt className="text-stone text-xs">Actor</dt>
+                    <dd className="mt-1 font-semibold">{entry.actor}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-stone text-xs">Resource</dt>
+                    <dd className="mt-1 font-semibold">{entry.resource}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-stone text-xs">Detail</dt>
+                    <dd className="mt-1 leading-6">{entry.detail}</dd>
+                  </div>
+                </dl>
+              </li>
+            ))}
+          </ul>
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full min-w-[48rem] text-left text-sm">
               <thead className="bg-parchment/60 text-stone text-xs tracking-[0.14em] uppercase">
                 <tr>

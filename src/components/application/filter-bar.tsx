@@ -19,7 +19,7 @@ export function FilterBar({
   placeholder?: string;
 }) {
   return (
-    <form className="border-ink/10 flex flex-col gap-3 rounded-2xl border bg-white/70 p-3 sm:flex-row">
+    <form className="border-ink/10 grid gap-3 rounded-2xl border bg-white/70 p-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_auto_auto]">
       <label className="relative flex-1">
         <span className="sr-only">{placeholder}</span>
         <Search
@@ -34,10 +34,10 @@ export function FilterBar({
           placeholder={placeholder}
         />
       </label>
-      <label>
+      <label className="min-w-0">
         <span className="sr-only">Filter by status</span>
         <select
-          className="border-ink/15 text-ink focus:border-garnet focus:ring-garnet/10 min-h-12 min-w-48 rounded-xl border bg-white px-4 text-sm font-semibold outline-none focus:ring-3"
+          className="border-ink/15 text-ink focus:border-garnet focus:ring-garnet/10 min-h-12 w-full rounded-xl border bg-white px-4 text-base font-semibold outline-none focus:ring-3 sm:text-sm lg:min-w-48"
           name="status"
           defaultValue={filter}
         >
@@ -48,7 +48,7 @@ export function FilterBar({
           ))}
         </select>
       </label>
-      <button className="bg-ink text-porcelain hover:bg-garnet min-h-12 rounded-xl px-5 text-sm font-semibold">
+      <button className="bg-ink text-porcelain hover:bg-garnet min-h-12 w-full rounded-xl px-5 text-sm font-semibold sm:col-span-2 lg:col-span-1 lg:w-auto">
         Apply
       </button>
     </form>

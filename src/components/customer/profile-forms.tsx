@@ -113,7 +113,10 @@ export function ProfileForms({
             />
             Receive occasional atelier stories and collection notes
           </label>
-          <SubmitButton pendingLabel="Saving profile…">
+          <SubmitButton
+            className="w-full sm:w-auto"
+            pendingLabel="Saving profile…"
+          >
             <Save aria-hidden="true" size={17} />
             Save profile
           </SubmitButton>
@@ -186,7 +189,10 @@ export function ProfileForms({
               />
             </div>
           </div>
-          <SubmitButton className="mt-3" pendingLabel="Saving preferences…">
+          <SubmitButton
+            className="mt-3 w-full sm:w-auto"
+            pendingLabel="Saving preferences…"
+          >
             <Bell aria-hidden="true" size={17} />
             Save notification preferences
           </SubmitButton>

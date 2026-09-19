@@ -52,7 +52,7 @@ export function LegalPage({
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-stone hover:text-garnet focus-visible:outline-garnet rounded-sm py-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+                className="text-stone hover:text-garnet focus-visible:outline-garnet flex min-h-11 items-center rounded-sm py-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
               >
                 {link.label}
               </Link>

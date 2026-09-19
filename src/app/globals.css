@@ -32,17 +32,46 @@
 }
 
 html {
+  min-width: 320px;
+  overflow-x: clip;
   scroll-behavior: smooth;
 }
 
 body {
   min-width: 320px;
+  overflow-x: clip;
   background:
     radial-gradient(circle at 12% 8%, rgb(169 130 66 / 0.1), transparent 26rem),
     var(--porcelain);
   color: var(--ink);
   font-family: var(--font-afacad), sans-serif;
   text-rendering: optimizeLegibility;
+}
+
+main,
+section,
+article,
+aside,
+header,
+footer,
+nav,
+form,
+fieldset {
+  min-width: 0;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+p,
+dd {
+  overflow-wrap: anywhere;
 }
 
 ::selection {
@@ -55,6 +84,12 @@ input,
 textarea,
 select {
   -webkit-tap-highlight-color: transparent;
+}
+
+input,
+textarea,
+select {
+  max-width: 100%;
 }
 
 :focus-visible {
@@ -92,6 +127,27 @@ select {
   font-weight: 500;
   letter-spacing: -0.045em;
   line-height: 0.98;
+}
+
+.workspace-title {
+  font-family: var(--font-bodoni), serif;
+  font-size: clamp(2.35rem, 10vw, 3.75rem);
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+
+.horizontal-scroll {
+  scrollbar-color: rgb(127 39 54 / 0.32) transparent;
+  scrollbar-width: thin;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  height: 0.3rem;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(127 39 54 / 0.32);
 }
 
 .nav-link {
@@ -145,5 +201,23 @@ select {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 40rem) {
+  input,
+  select,
+  textarea {
+    font-size: 1rem !important;
+  }
+}
+
+@media (max-width: 25rem) {
+  .display-title {
+    font-size: clamp(2.8rem, 15vw, 3.5rem);
+  }
+
+  .section-space {
+    padding-block: 4rem;
   }
 }

@@ -286,7 +286,7 @@ export function PortfolioManager({
       <section className="grid gap-5 lg:grid-cols-2">
         {projects.map((project) => (
           <Card key={project.id} className="p-6">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
               <h2 className="font-display text-3xl">{project.title}</h2>
               <Badge>{project.status}</Badge>
             </div>

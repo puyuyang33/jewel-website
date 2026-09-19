@@ -220,9 +220,7 @@ export function QuoteComparison({
             <Badge className="border-brass/40 text-brass bg-transparent">
               Quote version {quote.version}
             </Badge>
-            <h1 className="font-display mt-5 text-5xl leading-none">
-              {quote.title}
-            </h1>
+            <h1 className="workspace-title mt-5">{quote.title}</h1>
             {quote.introduction ? (
               <p className="text-porcelain/70 mt-4 max-w-2xl leading-7">
                 {quote.introduction}

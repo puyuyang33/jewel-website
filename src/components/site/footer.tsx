@@ -32,7 +32,7 @@ export function SiteFooter() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-porcelain/70 focus-visible:outline-parchment rounded-sm transition hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
+              className="text-porcelain/70 focus-visible:outline-parchment inline-flex min-h-11 items-center rounded-sm py-1 transition hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
             >
               {item.label}
             </Link>

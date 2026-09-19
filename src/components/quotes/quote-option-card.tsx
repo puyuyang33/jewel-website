@@ -65,7 +65,7 @@ export function QuoteOptionCard({
           <dd className="text-stone mt-1">{option.deliverables}</dd>
         </div>
       </dl>
-      <div className="text-stone mt-5 flex items-center justify-between gap-4 text-sm">
+      <div className="text-stone mt-5 flex flex-col items-start justify-between gap-2 text-sm sm:flex-row sm:items-center sm:gap-4">
         <span className="flex items-center gap-2">
           <RotateCcw aria-hidden="true" size={16} />
           {option.includedRevisionRounds} revisions

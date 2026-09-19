@@ -227,7 +227,7 @@ function InboxRow({
     <li>
       <Link
         href={`/admin/inbox/${conversation.id}`}
-        className={`hover:bg-parchment/45 grid min-h-24 grid-cols-[auto_1fr_auto] items-center gap-4 px-5 py-4 transition ${
+        className={`hover:bg-parchment/45 grid min-h-24 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 px-4 py-4 transition sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-4 sm:px-5 ${
           unread ? "bg-garnet/[0.06]" : ""
         }`}
       >
@@ -279,9 +279,9 @@ function InboxRow({
         </span>
         <time
           dateTime={conversation.latestMessageAt ?? conversation.updatedAt}
-          className={
-            unread ? "text-garnet text-xs font-bold" : "text-stone text-xs"
-          }
+          className={`col-start-2 text-xs sm:col-start-3 sm:row-start-1 sm:self-start ${
+            unread ? "text-garnet font-bold" : "text-stone"
+          }`}
         >
           {relativeInboxTime(
             conversation.latestMessageAt ?? conversation.updatedAt,

@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { chromium, devices, expect, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 const publicRoutes = [
   { path: "/", heading: /Jewelry, composed around a life/i },
@@ -52,8 +52,8 @@ test.describe("Veyra Atelier public experience", () => {
     page,
   }, testInfo) => {
     test.skip(
-      testInfo.project.name.includes("mobile"),
-      "Desktop navigation is hidden in the mobile project.",
+      testInfo.project.name !== "desktop-chromium",
+      "Desktop navigation is replaced by the compact menu below 1280px.",
     );
 
     await page.goto("/");
@@ -73,12 +73,7 @@ test.describe("Veyra Atelier public experience", () => {
 
   test("published portfolio cards open a canonical detail route", async ({
     page,
-  }, testInfo) => {
-    test.skip(
-      testInfo.project.name.includes("mobile"),
-      "The styled mobile journey is covered by the dedicated Chromium context.",
-    );
-
+  }) => {
     await page.goto("/portfolio");
     const detailLink = page
       .getByRole("link", { name: "Read the study" })
@@ -98,51 +93,40 @@ test.describe("Veyra Atelier public experience", () => {
     ).toHaveAttribute("href", "/portfolio");
   });
 
-  test("mobile navigation works without horizontal overflow", async ({}, testInfo) => {
+  test("compact navigation is clear and touch-friendly", async ({
+    page,
+  }, testInfo) => {
     test.skip(
-      !testInfo.project.name.includes("mobile"),
-      "Covered by the mobile project.",
+      testInfo.project.name === "desktop-chromium",
+      "The desktop project uses the expanded primary navigation.",
     );
 
-    const mobileBrowser = await chromium.launch();
-    const iphone = devices["iPhone 13"];
-    const context = await mobileBrowser.newContext({
-      baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000",
-      deviceScaleFactor: iphone.deviceScaleFactor,
-      hasTouch: iphone.hasTouch,
-      isMobile: iphone.isMobile,
-      userAgent: iphone.userAgent,
-      viewport: iphone.viewport,
+    await page.goto("/");
+    const trigger = page.getByRole("button", { name: "Open navigation" });
+    await expect(trigger).toBeVisible();
+    const triggerBox = await trigger.boundingBox();
+    expect(triggerBox?.width).toBeGreaterThanOrEqual(44);
+    expect(triggerBox?.height).toBeGreaterThanOrEqual(44);
+
+    await trigger.click();
+    const compactNavigation = page.getByRole("navigation", {
+      name: "Mobile navigation",
     });
-    const mobilePage = await context.newPage();
+    await expect(compactNavigation).toBeVisible();
+    const processLink = compactNavigation.getByRole("link", {
+      name: "Process",
+    });
+    const processLinkBox = await processLink.boundingBox();
+    expect(processLinkBox?.height).toBeGreaterThanOrEqual(44);
+    await processLink.click();
 
-    try {
-      await mobilePage.goto("/");
-      await expect(mobilePage.locator("body")).toHaveCSS(
-        "background-color",
-        "rgb(246, 242, 234)",
-      );
-      await mobilePage.getByRole("button", { name: "Open navigation" }).click();
-      await mobilePage
-        .getByRole("navigation", { name: "Mobile navigation" })
-        .getByRole("link", { name: "Process" })
-        .click();
-
-      await expect(mobilePage).toHaveURL(/\/process$/);
-      await expect(
-        mobilePage.getByRole("heading", {
-          level: 1,
-          name: /Measured, open, and deeply personal/i,
-        }),
-      ).toBeVisible();
-
-      const overflow = await mobilePage.evaluate(
-        () => document.documentElement.scrollWidth - window.innerWidth,
-      );
-      expect(overflow).toBeLessThanOrEqual(1);
-    } finally {
-      await mobileBrowser.close();
-    }
+    await expect(page).toHaveURL(/\/process$/);
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: /Measured, open, and deeply personal/i,
+      }),
+    ).toBeVisible();
   });
 
   test("every public route exposes a unique primary heading", async ({
@@ -155,6 +139,13 @@ test.describe("Veyra Atelier public experience", () => {
           page.getByRole("heading", { level: 1, name: route.heading }),
         ).toBeVisible();
         await expect(page.locator("main#main-content")).toHaveCount(1);
+        const overflow = await page.evaluate(
+          () => document.documentElement.scrollWidth - window.innerWidth,
+        );
+        expect(
+          overflow,
+          `${route.path} must not scroll horizontally`,
+        ).toBeLessThanOrEqual(1);
       });
     }
   });

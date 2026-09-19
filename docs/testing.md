@@ -5,14 +5,14 @@
 - Node.js matching `.nvmrc`.
 - npm 10 or newer.
 - Docker Desktop for local Supabase and pgTAP tests.
-- Chromium installed by Playwright.
+- Chromium and WebKit installed by Playwright.
 - Stripe CLI only for manual webhook smoke tests.
 
 Install dependencies:
 
 ```powershell
 npm ci
-npx playwright install chromium
+npx playwright install chromium webkit
 ```
 
 Automated tests use fictional identities and Stripe test values. They must not
@@ -23,6 +23,7 @@ send real email or create live charges.
 | Command                             | Purpose                                                     |
 | ----------------------------------- | ----------------------------------------------------------- |
 | `npm run format:check`              | Verify repository formatting                                |
+| `npm run check:manual-workflows`    | Reject every non-manual GitHub Actions trigger              |
 | `npm run check:public-dependencies` | Reject internal package names and non-public registries     |
 | `npm run lint`                      | Run strict Next.js and accessibility lint rules             |
 | `npm run typecheck`                 | Generate route types and run strict TypeScript              |
@@ -31,7 +32,7 @@ send real email or create live charges.
 | `npm run test:component`            | Run interactive component tests                             |
 | `npm run test:integration`          | Run integration tests; provider tests opt in                |
 | `npm run test:rls`                  | Execute pgTAP database, RLS, and transaction tests          |
-| `npm run test:e2e`                  | Run desktop and mobile Playwright journeys                  |
+| `npm run test:e2e`                  | Build, then run desktop, iPad, and mobile browser journeys  |
 | `npm run build`                     | Create the production Next.js build                         |
 | `npm run free:build`                | Create an account-independent `free-demo` Next.js build     |
 | `npm run free:build:netlify`        | Validate the linked Netlify OpenNext adapter from Linux/WSL |
@@ -90,9 +91,17 @@ Webhook tests construct signed fixture bodies and cover:
 
 ## End-to-end tests
 
-Playwright runs desktop Chromium and an iPhone-sized Chromium profile. Google
-login itself is not automated. Private journeys use controlled local auth
-fixtures.
+Playwright runs desktop Chromium plus iPhone and iPad Pro portrait/landscape
+WebKit profiles. Public routes must retain one visible primary heading
+and no document-level horizontal overflow at every size. Compact navigation
+must remain visible below 1280px with at least 44px touch targets. Google login
+itself is not automated. Private journeys use controlled local auth fixtures;
+component tests cover the compact workspace navigation and its single active
+destination.
+
+`npm run test:e2e` always creates a fresh production build and serves it with
+`next start`. This prevents parallel browser projects from sharing an
+in-progress development compilation.
 
 Required journeys include public navigation, multiple requests, private
 messaging, cross-customer denial, quote negotiation and acceptance, commission

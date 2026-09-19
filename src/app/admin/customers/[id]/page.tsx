@@ -68,7 +68,7 @@ export default async function AdminCustomerPage({
               <Link
                 key={request.id}
                 href={`/admin/requests/${request.id}`}
-                className="border-ink/10 hover:bg-parchment/35 flex items-center justify-between gap-4 rounded-2xl border bg-white p-5"
+                className="border-ink/10 hover:bg-parchment/35 flex flex-col items-start justify-between gap-3 rounded-2xl border bg-white p-5 sm:flex-row sm:items-center sm:gap-4"
               >
                 <div>
                   <p className="font-semibold">{request.title}</p>
@@ -99,7 +99,7 @@ export default async function AdminCustomerPage({
               <Link
                 key={commission.id}
                 href={`/admin/commissions/${commission.id}`}
-                className="border-ink/10 hover:bg-parchment/35 flex items-center justify-between gap-4 rounded-2xl border bg-white p-5"
+                className="border-ink/10 hover:bg-parchment/35 flex flex-col items-start justify-between gap-3 rounded-2xl border bg-white p-5 sm:flex-row sm:items-center sm:gap-4"
               >
                 <div>
                   <p className="font-semibold">{commission.title}</p>

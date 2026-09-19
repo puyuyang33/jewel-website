@@ -44,13 +44,18 @@ export function ApplicationShell({
         </div>
       </aside>
       <div className="xl:pl-72">
-        <div className="border-ink/10 bg-porcelain border-b px-4 py-3 xl:hidden">
-          <div className="mx-auto flex max-w-6xl items-center justify-between">
+        <div className="border-ink/10 bg-porcelain/95 sticky top-0 z-40 border-b px-4 py-3 backdrop-blur-xl xl:hidden">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
             <Logo />
-            <Badge>{workspaceLabel}</Badge>
+            <Badge className="max-w-[9rem] truncate text-[0.65rem] sm:max-w-none">
+              {workspaceLabel}
+            </Badge>
           </div>
         </div>
-        <main id="main-content" className="mx-auto max-w-6xl px-4 py-8 sm:px-8">
+        <main
+          id="main-content"
+          className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
+        >
           {children}
         </main>
       </div>

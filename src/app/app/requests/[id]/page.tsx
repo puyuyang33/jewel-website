@@ -195,7 +195,7 @@ export default async function DesignRequestDetailPage({
                       : "not sent"}
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   <StatusPill tone={statusTone(quote.status)}>
                     {humanizeStatus(quote.status)}
                   </StatusPill>

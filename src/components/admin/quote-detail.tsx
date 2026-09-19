@@ -102,7 +102,7 @@ export function AdminQuoteDetail({
             <Badge className="border-brass/40 text-brass bg-transparent">
               Version {quote.version}
             </Badge>
-            <h1 className="font-display mt-4 text-5xl">{quote.title}</h1>
+            <h1 className="workspace-title mt-4">{quote.title}</h1>
             <p className="text-porcelain/65 mt-3">
               {quote.options.length} option
               {quote.options.length === 1 ? "" : "s"} · {quote.productionWeeks}{" "}

@@ -63,9 +63,7 @@ export function CommissionWorkspace({
             <p className="text-brass text-xs font-bold tracking-[0.2em] uppercase">
               {commission.referenceCode}
             </p>
-            <h1 className="font-display mt-4 text-5xl leading-none">
-              {commission.title}
-            </h1>
+            <h1 className="workspace-title mt-4">{commission.title}</h1>
             <p className="text-porcelain/65 mt-4">
               Accepted quote version {commission.acceptedQuoteVersion} ·{" "}
               {formatMoney(commission.totalMinor, commission.currency)}

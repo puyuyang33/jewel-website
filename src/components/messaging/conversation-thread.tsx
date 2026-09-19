@@ -36,7 +36,10 @@ export function ConversationThread({
   }
 
   return (
-    <ol className="space-y-5 px-3 py-6 sm:px-6" aria-label="Conversation">
+    <ol
+      className="space-y-5 px-2 py-5 sm:px-6 sm:py-6"
+      aria-label="Conversation"
+    >
       {messages.map((message) => (
         <li
           key={message.id}
@@ -47,7 +50,7 @@ export function ConversationThread({
         >
           <article
             className={cn(
-              "max-w-[88%] rounded-3xl px-4 py-3 sm:max-w-[72%]",
+              "max-w-[94%] rounded-3xl px-3.5 py-3 sm:max-w-[78%] sm:px-4 xl:max-w-[72%]",
               message.isOwn
                 ? "bg-ink text-porcelain rounded-br-md"
                 : "border-ink/10 text-ink rounded-bl-md border bg-white",
@@ -55,7 +58,7 @@ export function ConversationThread({
                 "border-2 border-red-400 bg-red-50 text-red-950",
             )}
           >
-            <div className="flex items-center gap-2 text-xs font-semibold opacity-70">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold opacity-70">
               <span>{message.senderName}</span>
               <span aria-hidden="true">/</span>
               <time dateTime={message.createdAt}>

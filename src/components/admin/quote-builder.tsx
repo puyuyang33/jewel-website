@@ -240,7 +240,7 @@ export function QuoteBuilder({
         </div>
       </Card>
 
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <p className="eyebrow">Comparative options</p>
           <h2 className="font-display mt-2 text-4xl">Scope & line items</h2>
@@ -259,7 +259,7 @@ export function QuoteBuilder({
 
       {options.map((option, optionIndex) => (
         <Card key={option.key} className="p-6">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
             <h3 className="font-display text-3xl">Option {optionIndex + 1}</h3>
             <Button
               type="button"
@@ -364,7 +364,7 @@ export function QuoteBuilder({
           </div>
 
           <div className="border-ink/10 mt-6 border-t pt-5">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
               <h4 className="font-semibold">Line items</h4>
               <Button
                 type="button"
@@ -464,10 +464,10 @@ export function QuoteBuilder({
         </Card>
       ))}
 
-      <div className="sticky bottom-4 flex justify-end">
+      <div className="sticky bottom-2 z-20 -mx-2 flex justify-end rounded-2xl bg-[#f1ece3]/92 p-2 backdrop-blur-sm sm:bottom-4 sm:mx-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
         <SubmitButton
           size="lg"
-          className="shadow-2xl"
+          className="w-full shadow-2xl sm:w-auto"
           pendingLabel="Saving immutable inputs…"
         >
           <Save aria-hidden="true" size={17} />

@@ -112,7 +112,7 @@ export function UploadedMessageComposer({
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="border-ink/10 bg-porcelain border-t p-4"
+      className="border-ink/10 bg-porcelain border-t p-3 sm:p-4"
     >
       <ActionMessage result={state} />
       <label className="sr-only" htmlFor={`message-${conversationId}`}>
@@ -136,7 +136,7 @@ export function UploadedMessageComposer({
         />
       </div>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-        <label className="text-stone hover:bg-parchment hover:text-ink inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-4 text-sm font-semibold transition">
+        <label className="text-stone hover:bg-parchment hover:text-ink inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold transition sm:w-auto sm:justify-start">
           <ImagePlus aria-hidden="true" size={18} />
           Add references
           <input
@@ -149,6 +149,7 @@ export function UploadedMessageComposer({
           />
         </label>
         <Button
+          className="w-full sm:w-auto"
           type="submit"
           disabled={pending || Boolean(uploads.validationError)}
         >

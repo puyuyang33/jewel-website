@@ -28,7 +28,7 @@ export function RecordList({
           <li key={item.id}>
             <Link
               href={item.href}
-              className="hover:bg-parchment/45 focus-visible:outline-garnet grid min-h-24 grid-cols-[auto_1fr_auto] items-center gap-4 px-5 py-4 transition focus-visible:outline-2 focus-visible:-outline-offset-2"
+              className="hover:bg-parchment/45 focus-visible:outline-garnet grid min-h-24 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 py-4 transition focus-visible:outline-2 focus-visible:-outline-offset-2 sm:gap-4 sm:px-5"
             >
               {item.leading}
               <span className="min-w-0">

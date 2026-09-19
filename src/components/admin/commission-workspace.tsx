@@ -71,7 +71,7 @@ export function AdminCommissionWorkspace({
             <p className="text-brass text-xs font-bold tracking-[0.2em] uppercase">
               {commission.referenceCode}
             </p>
-            <h1 className="font-display mt-4 text-5xl">{commission.title}</h1>
+            <h1 className="workspace-title mt-4">{commission.title}</h1>
             <p className="text-porcelain/65 mt-3">
               {commission.customerName ?? "Customer"} ·{" "}
               {formatMoney(commission.totalMinor, commission.currency)}
@@ -208,7 +208,7 @@ export function AdminCommissionWorkspace({
               {commission.payments.map((payment) => (
                 <li
                   key={payment.id}
-                  className="flex items-center justify-between gap-4 py-3"
+                  className="flex flex-col items-start justify-between gap-2 py-3 sm:flex-row sm:items-center sm:gap-4"
                 >
                   <div>
                     <p className="font-semibold">
@@ -236,7 +236,7 @@ export function AdminCommissionWorkspace({
               {commission.deliverables.map((deliverable) => (
                 <li
                   key={deliverable.id}
-                  className="flex items-center justify-between gap-4 py-3"
+                  className="flex flex-col items-start justify-between gap-2 py-3 sm:flex-row sm:items-center sm:gap-4"
                 >
                   <span className="flex items-center gap-2 font-semibold">
                     <FileCheck2 aria-hidden="true" size={16} />

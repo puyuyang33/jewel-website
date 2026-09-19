@@ -16,7 +16,7 @@ export function MobileNavigation({ items }: { items: NavigationItem[] }) {
     <Dialog.Root>
       <Dialog.Trigger asChild>
         <Button
-          className="sm:hidden"
+          className="xl:hidden"
           variant="ghost"
           size="icon"
           aria-label="Open navigation"
@@ -26,11 +26,14 @@ export function MobileNavigation({ items }: { items: NavigationItem[] }) {
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="bg-ink/35 fixed inset-0 z-[70] backdrop-blur-sm data-[state=closed]:animate-[fade-out_180ms_ease] data-[state=open]:animate-[fade-in_180ms_ease]" />
-        <Dialog.Content className="border-ink/10 bg-porcelain fixed inset-x-3 top-3 z-[80] rounded-[1.75rem] border p-5 shadow-2xl focus:outline-none">
+        <Dialog.Content className="border-ink/10 bg-porcelain fixed inset-x-3 top-3 z-[80] max-h-[calc(100dvh-1.5rem)] overflow-y-auto overscroll-contain rounded-[1.75rem] border p-5 shadow-2xl focus:outline-none sm:left-auto sm:w-[26rem]">
           <div className="flex items-center justify-between">
             <Dialog.Title className="font-display text-2xl">
               Veyra Atelier
             </Dialog.Title>
+            <Dialog.Description className="sr-only">
+              Browse the atelier and access your private workspace.
+            </Dialog.Description>
             <Dialog.Close asChild>
               <Button variant="ghost" size="icon" aria-label="Close navigation">
                 <X aria-hidden="true" size={22} />
@@ -45,7 +48,7 @@ export function MobileNavigation({ items }: { items: NavigationItem[] }) {
               <Dialog.Close asChild key={item.href}>
                 <Link
                   href={item.href}
-                  className="border-ink/10 font-display focus-visible:outline-garnet border-b px-2 py-5 text-3xl last:border-b-0 focus-visible:outline-2"
+                  className="border-ink/10 font-display focus-visible:outline-garnet flex min-h-16 items-center border-b px-2 py-4 text-2xl last:border-b-0 focus-visible:outline-2 sm:text-3xl"
                 >
                   {item.label}
                 </Link>

@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000";
+const webServerCommand = process.env.PLAYWRIGHT_SERVER_COMMAND ?? "npm run dev";
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -18,15 +19,23 @@ export default defineConfig({
   projects: [
     {
       name: "desktop-chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: { ...devices["Desktop Chrome"], browserName: "chromium" },
     },
     {
-      name: "mobile-chromium",
-      use: { ...devices["iPhone 13"] },
+      name: "tablet-portrait-webkit",
+      use: { ...devices["iPad Pro 11"], browserName: "webkit" },
+    },
+    {
+      name: "tablet-landscape-webkit",
+      use: { ...devices["iPad Pro 11 landscape"], browserName: "webkit" },
+    },
+    {
+      name: "mobile-webkit",
+      use: { ...devices["iPhone 13"], browserName: "webkit" },
     },
   ],
   webServer: {
-    command: "npm run dev",
+    command: webServerCommand,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

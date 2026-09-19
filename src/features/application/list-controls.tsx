@@ -21,8 +21,8 @@ export function ListControls({
   sortOptions?: { value: string; label: string }[];
 }) {
   return (
-    <form className="border-ink/10 grid gap-3 rounded-2xl border bg-white/70 p-3 md:grid-cols-[1fr_auto_auto_auto]">
-      <label className="relative">
+    <form className="border-ink/10 grid gap-3 rounded-2xl border bg-white/70 p-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_auto_auto_auto]">
+      <label className="relative sm:col-span-2 lg:col-span-1">
         <span className="sr-only">{searchLabel}</span>
         <Search
           className="text-stone pointer-events-none absolute top-1/2 left-4 -translate-y-1/2"
@@ -37,10 +37,10 @@ export function ListControls({
         />
       </label>
       {statusOptions ? (
-        <label>
+        <label className="min-w-0">
           <span className="sr-only">Filter</span>
           <select
-            className="border-ink/15 min-h-12 min-w-48 rounded-xl border bg-white px-4 text-sm font-semibold"
+            className="border-ink/15 min-h-12 w-full rounded-xl border bg-white px-4 text-base font-semibold sm:text-sm lg:min-w-48"
             name="status"
             defaultValue={status}
           >
@@ -53,10 +53,10 @@ export function ListControls({
         </label>
       ) : null}
       {sortOptions.length > 0 ? (
-        <label>
+        <label className="min-w-0">
           <span className="sr-only">Sort</span>
           <select
-            className="border-ink/15 min-h-12 min-w-44 rounded-xl border bg-white px-4 text-sm font-semibold"
+            className="border-ink/15 min-h-12 w-full rounded-xl border bg-white px-4 text-base font-semibold sm:text-sm lg:min-w-44"
             name="sort"
             defaultValue={sort ?? "newest"}
           >
@@ -68,7 +68,7 @@ export function ListControls({
           </select>
         </label>
       ) : null}
-      <button className="bg-ink text-porcelain hover:bg-garnet min-h-12 rounded-full px-5 text-sm font-semibold">
+      <button className="bg-ink text-porcelain hover:bg-garnet min-h-12 w-full rounded-full px-5 text-sm font-semibold lg:w-auto">
         Apply
       </button>
     </form>

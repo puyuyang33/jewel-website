@@ -29,7 +29,7 @@ export function AdminDashboardView({
         <p className="text-parchment text-xs font-bold tracking-[0.2em] uppercase">
           Atelier operations
         </p>
-        <h1 className="font-display mt-5 max-w-3xl text-5xl leading-[0.9] tracking-[-0.04em] sm:text-6xl">
+        <h1 className="workspace-title mt-5 max-w-3xl">
           Decisions, not dashboards.
         </h1>
         <p className="mt-5 max-w-xl leading-7 text-white/70">

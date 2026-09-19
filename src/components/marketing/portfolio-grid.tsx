@@ -65,7 +65,7 @@ export function PortfolioGrid({
               ) : null}
               <Link
                 href={`/portfolio/${project.slug}`}
-                className="text-garnet border-garnet focus-visible:outline-garnet mt-6 inline-flex items-center gap-2 rounded-sm border-b pb-0.5 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-4"
+                className="text-garnet border-garnet focus-visible:outline-garnet -mx-1 mt-5 inline-flex min-h-11 items-center gap-2 rounded-sm border-b px-1 pt-1 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-4"
               >
                 Read the study
                 <ArrowUpRight aria-hidden="true" size={15} />

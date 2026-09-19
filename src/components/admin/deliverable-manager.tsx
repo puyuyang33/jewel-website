@@ -168,7 +168,7 @@ export function DeliverableManager({
         <div className="mt-5 space-y-4">
           {deliverables.map((deliverable) => (
             <Card key={deliverable.id} className="p-5">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-4">
                 <div>
                   <p className="font-semibold">{deliverable.title}</p>
                   <p className="text-stone mt-1 text-sm">

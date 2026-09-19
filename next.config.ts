@@ -1,6 +1,16 @@
 import type { NextConfig } from "next";
 
 const isDevelopment = process.env.NODE_ENV === "development";
+const usesHttpsApplicationOrigin = (() => {
+  try {
+    return (
+      typeof process.env.NEXT_PUBLIC_APP_URL === "string" &&
+      new URL(process.env.NEXT_PUBLIC_APP_URL).protocol === "https:"
+    );
+  } catch {
+    return false;
+  }
+})();
 const localSupabaseConnections = isDevelopment
   ? " http://127.0.0.1:54321 ws://127.0.0.1:54321 http://localhost:54321 ws://localhost:54321"
   : "";
@@ -19,7 +29,7 @@ const contentSecurityPolicy = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
-  "upgrade-insecure-requests",
+  ...(usesHttpsApplicationOrigin ? ["upgrade-insecure-requests"] : []),
 ].join("; ");
 
 const nextConfig: NextConfig = {
