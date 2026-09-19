@@ -24,6 +24,9 @@ are not configured.
 The workflow checks out the selected revision, installs the pinned Node.js
 version, runs `npm ci`, and runs `npm run verify`.
 
+`npm run verify` includes `npm run check:manual-workflows`, which fails if any
+workflow declares a trigger other than `workflow_dispatch`.
+
 The same gate is available locally:
 
 ```powershell
