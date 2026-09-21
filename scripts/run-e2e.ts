@@ -6,8 +6,15 @@ if (!npmExecutable) {
   throw new Error("Run E2E through `npm run test:e2e`.");
 }
 
+const e2eEnvironment = {
+  ...process.env,
+  NEXT_PUBLIC_SUPABASE_URL: "replace-with-e2e-supabase-url",
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: "replace-with-e2e-anon-key",
+  SUPABASE_SERVICE_ROLE_KEY: "replace-with-e2e-service-role-key",
+};
+
 const build = spawnSync(process.execPath, [npmExecutable, "run", "build"], {
-  env: process.env,
+  env: e2eEnvironment,
   stdio: "inherit",
 });
 
@@ -31,7 +38,7 @@ if (build.status !== 0) {
     [playwrightCli, "test", ...forwardedArguments],
     {
       env: {
-        ...process.env,
+        ...e2eEnvironment,
         PLAYWRIGHT_SERVER_COMMAND: "npm run start",
       },
       stdio: "inherit",

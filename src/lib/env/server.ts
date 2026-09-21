@@ -27,6 +27,8 @@ const serverEnvironmentSchema = z.object({
         .map((host) => host.trim().toLowerCase())
         .filter(Boolean),
     ),
+  NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: z.string().optional(),
+  VEYRA_VERCEL_ENV: z.enum(["preview", "production"]).optional(),
 });
 
 export type ServerEnvironment = z.infer<typeof serverEnvironmentSchema>;
@@ -45,5 +47,8 @@ export function getServerEnvironment(): ServerEnvironment {
     BUSINESS_TIMEZONE: process.env.BUSINESS_TIMEZONE,
     DEFAULT_CURRENCY: process.env.DEFAULT_CURRENCY,
     DELIVERABLE_ALLOWED_HOSTS: process.env.DELIVERABLE_ALLOWED_HOSTS,
+    NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:
+      process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,
+    VEYRA_VERCEL_ENV: process.env.VEYRA_VERCEL_ENV,
   });
 }

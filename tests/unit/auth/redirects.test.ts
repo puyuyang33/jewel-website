@@ -34,6 +34,23 @@ describe("safeInternalRedirect", () => {
     );
   });
 
+  it("builds exact stable Vercel Preview and Production callbacks", () => {
+    expect(
+      createOAuthCallbackUrl(
+        "https://veyra-preview.vercel.app",
+        "/app/requests",
+      ).toString(),
+    ).toBe(
+      "https://veyra-preview.vercel.app/auth/callback?next=%2Fapp%2Frequests",
+    );
+    expect(
+      createOAuthCallbackUrl(
+        "https://veyraatelier.com",
+        "/admin/inbox",
+      ).toString(),
+    ).toBe("https://veyraatelier.com/auth/callback?next=%2Fadmin%2Finbox");
+  });
+
   it.each([
     "https://attacker.example/app",
     "//attacker.example/app",

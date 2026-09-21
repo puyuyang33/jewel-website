@@ -12,7 +12,7 @@ describe("deployment tracks", () => {
     expect(resolveImageUploadLimitMegabytes("production")).toBe(4);
   });
 
-  it("uses the Netlify-safe upload limit for free demos", () => {
+  it("uses the Vercel Function-safe upload limit for free demos", () => {
     expect(resolveDeploymentTrack("free-demo")).toBe("free-demo");
     expect(resolveImageUploadLimitMegabytes("free-demo")).toBe(4);
   });

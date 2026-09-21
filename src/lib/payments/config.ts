@@ -1,15 +1,18 @@
 import "server-only";
 
-import { z } from "zod";
-
 import {
   LOCAL_APPLICATION_ORIGIN,
   normalizeOrigin,
 } from "@/lib/security/origin";
+import {
+  stripeModeSchema,
+  stripeSecretKeySchema,
+  stripeWebhookSecretSchema,
+} from "@/lib/providers/configuration-schemas";
 
-export const stripeModeSchema = z.enum(["test", "live"]);
+export { stripeModeSchema } from "@/lib/providers/configuration-schemas";
 
-export type StripeMode = z.infer<typeof stripeModeSchema>;
+export type StripeMode = "test" | "live";
 
 export type StripeConfigurationErrorCode =
   | "INVALID_STRIPE_MODE"
@@ -30,22 +33,6 @@ export class StripeConfigurationError extends Error {
     this.code = code;
   }
 }
-
-const stripeSecretKeySchema = z
-  .string()
-  .min(12)
-  .max(512)
-  .refine((value) => value === value.trim())
-  .refine((value) => !value.toLowerCase().includes("replace_me"))
-  .regex(/^sk_(?:test|live)_[A-Za-z0-9_]+$/u);
-
-const stripeWebhookSecretSchema = z
-  .string()
-  .min(7)
-  .max(512)
-  .refine((value) => value === value.trim())
-  .refine((value) => !value.toLowerCase().includes("replace_me"))
-  .regex(/^whsec_[A-Za-z0-9_]+$/u);
 
 export function stripeModeForEnvironment(
   nodeEnvironment = process.env.NODE_ENV,

@@ -1,6 +1,24 @@
 import type { NextConfig } from "next";
 
+import { validateVercelEnvironment } from "./src/lib/security/vercel-environment";
+
 const isDevelopment = process.env.NODE_ENV === "development";
+const declaredVercelEnvironment = process.env.VEYRA_VERCEL_ENV;
+if (
+  (declaredVercelEnvironment === "preview" ||
+    declaredVercelEnvironment === "production") &&
+  process.env.VERCEL_ENV !== declaredVercelEnvironment
+) {
+  throw new Error(
+    "Vercel System Environment Variables are missing or disagree with VEYRA_VERCEL_ENV.",
+  );
+}
+if (
+  process.env.VERCEL_ENV === "preview" ||
+  process.env.VERCEL_ENV === "production"
+) {
+  validateVercelEnvironment(process.env, process.env.VERCEL_ENV);
+}
 const usesHttpsApplicationOrigin = (() => {
   try {
     return (

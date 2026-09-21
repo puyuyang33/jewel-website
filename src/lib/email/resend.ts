@@ -6,6 +6,10 @@ import {
   LOCAL_APPLICATION_ORIGIN,
   normalizeOrigin,
 } from "@/lib/security/origin";
+import {
+  emailFromSchema,
+  resendApiKeySchema,
+} from "@/lib/providers/configuration-schemas";
 
 import {
   createDisabledEmailProvider,
@@ -15,27 +19,6 @@ import {
 } from "./provider";
 import type { CommissionEmailInput } from "./templates";
 
-const resendApiKeySchema = z
-  .string()
-  .min(4)
-  .max(512)
-  .refine((value) => value === value.trim())
-  .refine((value) => !value.toLowerCase().includes("replace_me"))
-  .regex(/^re_[A-Za-z0-9_]+$/u);
-const emailFromSchema = z
-  .string()
-  .trim()
-  .min(3)
-  .max(320)
-  .refine((value) => !/[\r\n]/u.test(value), {
-    message: "Sender must not contain line breaks",
-  })
-  .refine((value) => {
-    const namedAddress = /^[^<>]{1,100}\s+<([^<>\s]+@[^<>\s]+)>$/u.exec(
-      value,
-    )?.[1];
-    return z.email().safeParse(namedAddress ?? value).success;
-  }, "Sender must contain a valid email address");
 const providerMessageIdSchema = z.string().min(1).max(255);
 
 export interface ResendSendPayload {
