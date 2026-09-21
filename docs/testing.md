@@ -20,25 +20,28 @@ send real email or create live charges.
 
 ## Commands
 
-| Command                             | Purpose                                                     |
-| ----------------------------------- | ----------------------------------------------------------- |
-| `npm run format:check`              | Verify repository formatting                                |
-| `npm run check:manual-workflows`    | Reject every non-manual GitHub Actions trigger              |
-| `npm run check:public-dependencies` | Reject internal package names and non-public registries     |
-| `npm run lint`                      | Run strict Next.js and accessibility lint rules             |
-| `npm run typecheck`                 | Generate route types and run strict TypeScript              |
-| `npm test`                          | Run deterministic unit and component tests                  |
-| `npm run test:coverage`             | Run tests with domain/security coverage thresholds          |
-| `npm run test:component`            | Run interactive component tests                             |
-| `npm run test:integration`          | Run integration tests; provider tests opt in                |
-| `npm run test:rls`                  | Execute pgTAP database, RLS, and transaction tests          |
-| `npm run test:e2e`                  | Build, then run desktop, iPad, and mobile browser journeys  |
-| `npm run build`                     | Create the production Next.js build                         |
-| `npm run free:build`                | Create an account-independent `free-demo` Next.js build     |
-| `npm run free:build:netlify`        | Validate the linked Netlify OpenNext adapter from Linux/WSL |
-| `npm run verify`                    | Run formatting, lint, types, coverage, and build            |
-| `npm run verify:full`               | Add local RLS and E2E tests to `verify`                     |
-| `npm run audit:dependencies`        | Fail on high or critical npm advisories                     |
+| Command                             | Purpose                                                        |
+| ----------------------------------- | -------------------------------------------------------------- |
+| `npm run format:check`              | Verify repository formatting                                   |
+| `npm run check:manual-workflows`    | Reject every non-manual GitHub Actions trigger                 |
+| `npm run check:public-dependencies` | Reject internal package names and non-public registries        |
+| `npm run lint`                      | Run strict Next.js and accessibility lint rules                |
+| `npm run typecheck`                 | Generate route types and run strict TypeScript                 |
+| `npm test`                          | Run deterministic unit and component tests                     |
+| `npm run test:coverage`             | Run tests with domain/security coverage thresholds             |
+| `npm run test:component`            | Run interactive component tests                                |
+| `npm run test:integration`          | Run integration tests; provider tests opt in                   |
+| `npm run test:rls`                  | Execute pgTAP database, RLS, and transaction tests             |
+| `npm run test:e2e`                  | Build, then run desktop, iPad, and mobile browser journeys     |
+| `npm run build`                     | Create the production Next.js build                            |
+| `npm run build:vercel`              | Fail-closed Vercel remote build entrypoint                     |
+| `npm run demo:build`                | Create an account-independent `free-demo` Next.js build        |
+| `npm run vercel:doctor`             | Verify the pinned official native Vercel CLI                   |
+| `npm run check:vercel:preview`      | Validate Preview values loaded in the current trusted shell    |
+| `npm run check:vercel:production`   | Validate Production values loaded in the current trusted shell |
+| `npm run verify`                    | Run formatting, lint, types, coverage, and build               |
+| `npm run verify:full`               | Add local RLS and E2E tests to `verify`                        |
+| `npm run audit:dependencies`        | Fail on high or critical npm advisories                        |
 
 ## Local database tests
 

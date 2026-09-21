@@ -54,6 +54,12 @@ The route returns success only after durable recording. Invalid signatures,
 mismatched monetary data, or unavailable transaction workflows fail
 explicitly.
 
+Vercel Preview and Production require separate HTTPS webhook endpoints and
+separate `whsec_...` secrets. Preview uses a Stripe Sandbox and
+`STRIPE_MODE=test`; the commercial production track uses live mode and a
+matching live endpoint. The webhook path is excluded from Next.js Proxy and
+reads the raw body directly in the Route Handler.
+
 Subscribe the production webhook to exactly these handled events:
 
 ```text

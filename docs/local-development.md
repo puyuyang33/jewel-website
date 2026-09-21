@@ -33,6 +33,10 @@ npx supabase status
 Copy the displayed local URL, anonymous key, and service-role key into
 `.env.local`. Keep the service-role value server-only.
 
+Leave `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` empty for local development so
+Next.js generates a development key. Vercel Preview and Production instead
+require different operator-generated 32-byte Base64 keys.
+
 To exercise local Google OAuth, also set
 `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and
 `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` before starting Supabase. Email/password

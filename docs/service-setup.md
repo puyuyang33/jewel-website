@@ -1,10 +1,11 @@
 # Service Setup and Cost Plan
 
 This guide is the deployment checklist for a public Veyra Atelier repository.
-Prices and quotas were rechecked on 2026-09-17 and must be rechecked again
+Prices and quotas were rechecked on 2026-09-20 and must be rechecked again
 before purchase or launch.
 
-For a fully free prototype/demo track using Netlify Free and Supabase Free,
+For a fully free, personal, non-commercial prototype/demo track using Vercel
+Hobby and Supabase Free,
 see `docs/deployment-free-bilingual.md`. That track is intentionally limited
 to controlled test users and fewer than 200 Realtime connections. The paid
 recommendation below remains the production/300-customer track.
@@ -269,23 +270,35 @@ Source: [Resend pricing](https://resend.com/pricing).
 
 ## 8. Create the Vercel project
 
-Do not use bare `npx vercel` or add Vercel CLI to the application dependency
-tree. First pass the isolated Vercel CLI security gate in
-`docs/deployment-bilingual.md`. If no audit-clean provider version is
-available, the paid Vercel execution path is blocked; use the zero-cost
-Netlify Demo track for the MVP.
+Do not use bare `npx vercel`. The repository pins the official code-signed
+native Vercel CLI because the reviewed standard Node CLI contained
+high/critical transitive advisories.
 
 1. Create a Pro team with one deploying seat.
-2. Create a project without enabling Git auto-deployment.
-3. Set the framework to Next.js.
-4. Add environment variables from `.env.example`.
-5. Separate Preview and Production values.
-6. Never expose server variables with a `NEXT_PUBLIC_` prefix.
-7. Configure spend notifications.
-8. Deploy an unpromoted preview/candidate manually with the gated `$Vercel`
-   command from the bilingual runbook.
-9. Run smoke tests.
-10. Promote the approved candidate manually.
+2. Run `npm run vercel:doctor`, `npm run vercel:login`, and
+   `npm run vercel:link`.
+3. Create a project without enabling Git auto-deployment. The checked-in
+   `vercel.json` also sets `git.deploymentEnabled=false`.
+4. Set the framework to Next.js, enable System Environment Variables, and keep
+   the repository build command `npm run build:vercel`.
+5. Add environment variables from `.env.example`.
+6. Separate Preview and Production values.
+7. Set `VEYRA_VERCEL_ENV=preview` only in Preview and
+   `VEYRA_VERCEL_ENV=production` only in Production.
+8. Never expose server variables with a `NEXT_PUBLIC_` prefix.
+9. Generate different 32-byte Base64
+   `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` values for Preview and Production.
+10. Manually compare Preview and Production in the Dashboard and confirm
+    different origins, Supabase projects, Stripe Sandboxes/endpoints, and
+    Server Action keys.
+11. If the same values are loaded into a trusted local shell, run
+    `npm run check:vercel:preview` or
+    `npm run check:vercel:production`. These local checks do not read Vercel
+    Sensitive variables.
+12. Configure spend notifications.
+13. Deploy an unpromoted remote-build candidate with
+    `npm run vercel:deploy:candidate`.
+14. Run smoke tests, then use `npm run vercel:promote -- <candidate-url>`.
 
 No database migration runs from the Vercel build.
 

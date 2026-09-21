@@ -72,6 +72,10 @@ storage policies enforce their own relevant authorization. Navigation,
 layouts, hidden controls, and proxy redirects are convenience layers rather
 than security boundaries.
 
+On Vercel, Next.js Proxy covers pages but intentionally excludes `/api/*` so
+uploads and Stripe webhooks are not subject to Routing Middleware body limits.
+Every protected API route authenticates and authorizes independently.
+
 ## Cookies and expiration
 
 `@supabase/ssr` owns session cookies. The Next.js proxy refreshes expired

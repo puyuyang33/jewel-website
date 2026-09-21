@@ -2,7 +2,7 @@
 
 > **Document status / 文档状态:** Manual deployment only / 仅支持手动部署
 >
-> **Last verified / 最后核对日期:** 2026-09-17
+> **Last verified / 最后核对日期:** 2026-09-20
 >
 > **Repository type / 仓库类型:** Public GitHub repository / GitHub 公共仓库
 >
@@ -31,56 +31,35 @@ remains the recommended production/approximately-300-customer track.
 
 ### Vercel CLI security gate / Vercel CLI 安全 Gate
 
-The application repository intentionally does not include Vercel CLI. During
-the 2026-09-18 review, the available Vercel CLI dependency tree contained
-high/critical advisories. Every Vercel command below therefore uses the
-`$Vercel` variable and is **blocked** until an operator installs an exact
-provider version in an isolated directory and its complete dependency audit
-reports no high or critical finding.
+The standard Node-based Vercel CLI reviewed on 2026-09-20 contained
+high/critical transitive advisories and is intentionally absent. The
+repository instead pins Vercel's official code-signed experimental native CLI
+`@vercel/vc-native@59.23.2`, whose installed two-package tree passed
+`npm audit --audit-level=high`.
 
-应用仓库故意不包含 Vercel CLI。2026-09-18 审核时，可用 Vercel CLI 依赖树包含
-高危/严重公告。因此，下文所有 Vercel 命令都使用 `$Vercel` 变量；只有操作人员在
-仓库外隔离目录安装精确版本，且完整依赖审计无高危或严重问题后，才可继续。
+2026-09-20 审核的标准 Node 版 Vercel CLI 含 high/critical 传递依赖漏洞，因此不进入
+项目。仓库改为锁定 Vercel 官方签名的实验性 native CLI
+`@vercel/vc-native@59.23.2`；其两包依赖树已通过
+`npm audit --audit-level=high`。
 
 ```powershell
-$approvedVercelVersion = Read-Host "Owner-approved exact Vercel CLI version"
-if ($approvedVercelVersion -notmatch '^\d+\.\d+\.\d+$') {
-  throw "Vercel CLI version must be an exact semantic version."
-}
-$vercelToolRoot = Join-Path $env:USERPROFILE "veyra-vercel-cli"
-Remove-Item $vercelToolRoot -Recurse -Force -ErrorAction SilentlyContinue
-New-Item -ItemType Directory -Force -Path $vercelToolRoot | Out-Null
-Push-Location $vercelToolRoot
-try {
-  npm init -y
-  if ($LASTEXITCODE -ne 0) { throw "Vercel tool initialization failed." }
-  npm install --save-exact "vercel@$approvedVercelVersion"
-  if ($LASTEXITCODE -ne 0) { throw "Vercel CLI installation failed." }
-  npm audit --audit-level=high
-  if ($LASTEXITCODE -ne 0) {
-    throw "Vercel CLI security gate failed. Use the free Netlify track or wait for an audit-clean release."
-  }
-  $Vercel = Join-Path $vercelToolRoot "node_modules\.bin\vercel.cmd"
-  if (-not (Test-Path $Vercel)) { throw "Pinned Vercel CLI binary is missing." }
-  $reportedVercelVersion = (& $Vercel --version 2>&1 | Out-String)
-  if ($LASTEXITCODE -ne 0 -or
-      $reportedVercelVersion -notmatch [regex]::Escape($approvedVercelVersion)) {
-    throw "Installed Vercel CLI version does not match the approved version."
-  }
-}
-finally {
-  Pop-Location
-}
+npm ci
+npm audit --audit-level=high
+npm run vercel:doctor
+
+$Vercel = (Resolve-Path `
+  ".\node_modules\@vercel\vc-native\bin\vercel.exe").Path
 ```
 
-Do not replace `$Vercel` with bare `npx vercel`, and do not add Vercel CLI to
-the application dependencies. If no audit-clean CLI exists, this paid CLI
-runbook is not approved for execution; the architecture recommendation remains
-available for a later provider release.
+On macOS/Linux use
+`./node_modules/@vercel/vc-native/bin/vercel.exe`; the provider keeps this
+filename for its signed native binaries on every supported OS. Do not replace
+this with bare `npx vercel`, a global standard Node CLI, or an unpinned
+version. Re-run the audit immediately before deployment.
 
-禁止把 `$Vercel` 替换为裸 `npx vercel`，也不要把 Vercel CLI 加入应用依赖。如果没有
-审计通过的 CLI，则本付费 CLI 部署流程不得执行；Vercel Pro 架构建议保留，等待后续
-安全版本。
+macOS/Linux 使用 `./node_modules/@vercel/vc-native/bin/vercel.exe`；服务商在所有
+支持的系统中都保留该文件名。禁止替换为裸 `npx vercel`、全局标准 Node CLI 或未锁定
+版本。每次部署前重新执行 audit。
 
 ---
 
@@ -259,6 +238,13 @@ Only `.env.example` may be committed. It contains names and placeholders, not
 secrets.
 
 只有 `.env.example` 可以提交；其中只能包含变量名和占位值。
+
+The checked-in `.vercelignore` independently excludes `.env*`,
+keys/certificates, database assets, tests, documentation, and generated
+artifacts from manual CLI source deployments. Review it before every release.
+
+仓库中的 `.vercelignore` 还会在手动 CLI source deployment 时排除 `.env*`、
+key/certificate、数据库文件、测试、文档和生成产物；每次发布前都必须复核。
 
 ### 2.3 Verify GitHub Actions behavior / 验证 GitHub Actions 行为
 
@@ -585,11 +571,15 @@ npm run check:public-dependencies
 
 Current verified baseline / 当前已验证基线：
 
-- 368 unit/API tests passed / 368 个单元与 API 测试通过
-- 26 component tests passed / 26 个组件测试通过
-- 13 public browser tests passed / 13 个公共页面浏览器测试通过
+- 403 unit/API tests passed / 403 个单元与 API 测试通过
+- 27 component tests passed / 27 个组件测试通过
+- 28 public browser tests passed, with 4 intentional device-role skips /
+  28 个公共页面浏览器测试通过，另有 4 个按设备职责设计的跳过项
 - Production build passed / 生产构建通过
 - Dependency audit: zero vulnerabilities / 依赖漏洞为 0
+- Coverage: 85.28% statements, 81.23% branches, 93.44% functions, 85.31%
+  lines / 覆盖率：statements 85.28%、branches 81.23%、functions 93.44%、
+  lines 85.31%
 
 **GO/NO-GO 2:** Do not deploy a preview if formatting, lint, typecheck, tests,
 public dependencies, or production build fails.
@@ -732,48 +722,137 @@ Complete Vercel setup **before creating or changing production resources**:
 必须在创建或修改生产资源之前完成 Vercel Preview：
 
 ```powershell
-& $Vercel login
-& $Vercel link
+npm run vercel:login
+npm run vercel:link
 ```
 
 Create a new Vercel project, confirm Next.js detection, and do not connect Git
-auto-deployment. Add Preview environment values for the non-production
-Supabase project, test Stripe key, test administrator, business settings, and a
-Preview-specific Server Action encryption key.
+auto-deployment. The checked-in `vercel.json` also sets
+`git.deploymentEnabled=false`.
 
-创建新 Vercel 项目，确认识别为 Next.js，不连接 Git 自动部署。为 Preview 添加非生产
-Supabase、Stripe 测试密钥、测试管理员、业务设置和 Preview 专用 Server Action
-加密密钥。
+创建新 Vercel 项目，确认识别为 Next.js，不连接 Git 自动部署。仓库中的
+`vercel.json` 也设置了 `git.deploymentEnabled=false`。
 
-Create the first bootstrap preview:
+Before any deployment, configure these Project Settings now:
 
-创建首次 bootstrap Preview：
+任何 deployment 前，立即配置以下 Project Settings：
+
+- Framework Preset: Next.js
+- Install Command: `npm ci`
+- Build Command: `npm run build:vercel`
+- Enable Automatically expose System Environment Variables /
+  启用 Automatically expose System Environment Variables
+
+Choose the stable Preview alias now. Add it to the Vercel project, configure
+DNS, wait for TLS, and make it publicly reachable through a Deployment
+Protection domain exception:
+
+现在选择稳定 Preview alias。把它加入 Vercel Project，配置 DNS、等待 TLS，并通过
+Deployment Protection domain exception 让它可公开访问：
 
 ```powershell
-$firstPreview = & $Vercel
 & $Vercel domains add <STABLE_PREVIEW_ALIAS>
-& $Vercel alias set $firstPreview <STABLE_PREVIEW_ALIAS>
 ```
 
-Configure the stable alias in Preview Google OAuth, Preview Supabase Site
-URL/redirect URLs, and a Stripe test webhook:
+Configure that alias in Preview Supabase and create the Stripe Sandbox
+webhook **before** entering the environment matrix:
 
-把稳定 alias 配置到 Preview Google OAuth、Preview Supabase Site URL/redirect
-URLs 和 Stripe 测试 webhook：
+在录入环境变量矩阵**之前**，先把该 alias 配置到 Preview Supabase，并创建 Stripe
+Sandbox webhook：
 
 ```text
-https://STABLE_PREVIEW_ALIAS/auth/callback
-https://STABLE_PREVIEW_ALIAS/api/webhooks/stripe
+Supabase Site URL: https://STABLE_PREVIEW_ALIAS
+Supabase Redirect URL: https://STABLE_PREVIEW_ALIAS/auth/callback
+Stripe webhook: https://STABLE_PREVIEW_ALIAS/api/webhooks/stripe
 ```
 
-Set `NEXT_PUBLIC_APP_URL=https://STABLE_PREVIEW_ALIAS` and the matching preview
-`STRIPE_WEBHOOK_SECRET`, then create and alias a second preview:
+Copy the resulting Preview `whsec_...`. OAuth and Stripe cannot complete
+through a protected browser origin; application authentication still protects
+`/app` and `/admin`.
 
-设置 `NEXT_PUBLIC_APP_URL=https://STABLE_PREVIEW_ALIAS` 和匹配的 Preview
-`STRIPE_WEBHOOK_SECRET`，然后创建并绑定第二次 Preview：
+保存生成的 Preview `whsec_...`。OAuth 与 Stripe 无法通过受保护的浏览器 origin；
+应用自身认证仍保护 `/app` 与 `/admin`。
+
+Also complete the §13 environment matrix now. In Preview set
+`VEYRA_VERCEL_ENV=preview`, the non-production Supabase project, Stripe test
+values, test administrator, business settings, and a Preview-specific Server
+Action key. In temporary bootstrap Production set
+`VEYRA_VERCEL_ENV=production` and the explicitly temporary `free-demo` values
+described below. Sections 12–13 later are mandatory re-verification, not the
+first time these prerequisites are configured.
+
+现在还必须完成 §13 环境变量矩阵。Preview 设置
+`VEYRA_VERCEL_ENV=preview`、非生产 Supabase、Stripe test、测试管理员、业务设置
+和 Preview 专用 Server Action key。临时 bootstrap Production 设置
+`VEYRA_VERCEL_ENV=production`，并使用下文明确说明的临时 `free-demo` 值。后续
+§12–§13 是强制复核，不是首次配置这些先决条件。
+
+Vercel treats a project's first deployment as Production even without
+`--prod`. To bootstrap safely, temporarily set the Vercel **Production**
+environment to the same fictional Preview Supabase/Stripe test resources,
+with `NEXT_PUBLIC_DEPLOYMENT_TRACK=free-demo`. Create an unaliased bootstrap
+deployment:
+
+Vercel 会把 Project 的第一次部署视为 Production，即使未使用 `--prod`。安全
+bootstrap 方式是：临时把 Vercel **Production** 环境配置为与 Preview 相同的虚构
+Supabase/Stripe test 资源，并设置
+`NEXT_PUBLIC_DEPLOYMENT_TRACK=free-demo`，然后创建不绑定域名的 bootstrap：
 
 ```powershell
-$validatedPreview = & $Vercel
+npm run vercel:deploy:candidate
+```
+
+`vercel:deploy:candidate` is pinned to
+`vercel deploy --prod --skip-domain`; Vercel uploads source, validates the
+write-only Sensitive variables during its remote build, and cannot assign the
+Production domain.
+
+`vercel:deploy:candidate` 固定执行
+`vercel deploy --prod --skip-domain`；Vercel 上传源码，在远程 build 中验证
+write-only Sensitive 变量，并且不会绑定 Production 域名。
+
+Copy the exact bootstrap deployment URL from the output, but do not promote
+it. It exists only to establish the Vercel project.
+Before §20, replace every temporary Production value with the real production
+values and validate them again.
+
+从输出复制精确的 bootstrap deployment URL，但不要 promote；它只用于建立 Vercel
+Project。§20 前必须把全部临时 Production 变量替换为真实生产变量，并重新验证。
+
+The temporary Production `NEXT_PUBLIC_DEPLOYMENT_TRACK=free-demo`,
+non-production Supabase values, and Stripe test values must all be removed.
+Set `NEXT_PUBLIC_DEPLOYMENT_TRACK=production`, the real production Supabase
+values, `STRIPE_MODE=live`, the matching live key/webhook secret, and a
+production-only Server Action key. Section 20 is blocked until
+the two Dashboard scopes have been compared manually and the remote
+Production build passes its `next.config.ts` environment gate.
+
+临时 Production 中的 `NEXT_PUBLIC_DEPLOYMENT_TRACK=free-demo`、非生产 Supabase
+和 Stripe test 值必须全部移除。改为
+`NEXT_PUBLIC_DEPLOYMENT_TRACK=production`、真实生产 Supabase、
+`STRIPE_MODE=live`、匹配的 live key/webhook secret 和生产专用 Server Action key。
+必须手动比较两个 Dashboard scope，并且远程 Production build 通过
+`next.config.ts` 环境 Gate 后，才能执行 §20。
+
+Set `NEXT_PUBLIC_APP_URL=https://STABLE_PREVIEW_ALIAS`, the matching Preview
+`STRIPE_WEBHOOK_SECRET`, and a dedicated 32-byte Base64
+`NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`. Deploy from source so the authoritative
+environment gate runs remotely, then alias the Preview:
+
+设置 `NEXT_PUBLIC_APP_URL=https://STABLE_PREVIEW_ALIAS`、匹配的 Preview
+`STRIPE_WEBHOOK_SECRET` 和独立的 32-byte Base64
+`NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`，然后远程构建、部署并绑定 Preview：
+
+```powershell
+npm run vercel:deploy:preview
+```
+
+Copy the exact Preview deployment URL from the output, then:
+
+从输出复制精确的 Preview deployment URL，然后执行：
+
+```powershell
+$validatedPreview = "https://EXACT-PREVIEW-DEPLOYMENT.vercel.app"
 & $Vercel alias set $validatedPreview <STABLE_PREVIEW_ALIAS>
 ```
 
@@ -1152,13 +1231,14 @@ create a second Vercel project.
 Vercel 项目和稳定 Preview 已在 §8.6 创建。本节用于在添加 Production 值前复核同一
 项目配置，不要创建第二个项目。
 
-Install or invoke the public Vercel CLI:
+Verify and invoke the pinned native Vercel CLI:
 
-安装或调用公共 Vercel CLI：
+验证并调用锁定的 Vercel native CLI：
 
 ```powershell
-& $Vercel login
-& $Vercel link
+npm run vercel:doctor
+npm run vercel:login
+npm run vercel:link
 ```
 
 When prompted:
@@ -1175,19 +1255,30 @@ When prompted:
 8. 不要导入或连接 GitHub 仓库进行自动部署。
 
 If the project was imported through the dashboard, disable Git deployments in
-Project Settings before continuing.
+Project Settings before continuing. The checked-in `vercel.json` independently
+sets `git.deploymentEnabled=false`.
 
 如果通过 Dashboard 导入项目，继续之前必须在 Project Settings 中关闭 Git 自动部署。
+仓库中的 `vercel.json` 也独立设置了 `git.deploymentEnabled=false`。
 
 Set:
 
 设置：
 
 - Node.js version matching `.nvmrc` / 与 `.nvmrc` 一致的 Node.js 版本
-- Build command: `npm run build`
+- Build command: `npm run build:vercel`
 - Install command: `npm ci`
 - Framework preset: Next.js
 - Function region near Supabase / Function 区域尽量靠近 Supabase
+- Enable Automatically expose System Environment Variables /
+  启用 Automatically expose System Environment Variables
+
+`build:vercel` fails when Vercel's system `VERCEL_ENV` is absent or disagrees
+with the manually scoped `VEYRA_VERCEL_ENV`. Do not override the repository
+build command in the Dashboard.
+
+`build:vercel` 会在 Vercel 系统 `VERCEL_ENV` 缺失，或与手动 scope 的
+`VEYRA_VERCEL_ENV` 不一致时失败。不要在 Dashboard 覆盖仓库定义的 build command。
 
 Do not add a migration command to the Vercel build.
 
@@ -1196,6 +1287,19 @@ Do not add a migration command to the Vercel build.
 ---
 
 ## 13. Configure Vercel environment variables / 配置 Vercel 环境变量
+
+Before entering write-only Sensitive values, create a private two-column
+Preview/Production worksheet. Compare the actual values side by side and
+record the Supabase project refs and Stripe Sandbox/live account plus endpoint
+IDs. Confirm the service-role keys, Stripe keys/webhook secrets, and Server
+Action keys were copied or generated independently. Sign off this comparison,
+then delete the temporary plaintext worksheet according to the credential
+policy.
+
+录入 write-only Sensitive 值之前，先在私密位置建立 Preview/Production 双栏
+worksheet，逐项比较真实值，并记录 Supabase project ref、Stripe Sandbox/live
+account 与 endpoint ID。确认 service-role key、Stripe key/webhook secret 和 Server
+Action key 都独立复制或生成。完成签字记录后，按凭据政策删除临时明文 worksheet。
 
 Use the Vercel dashboard or `& $Vercel env add`. Enter secrets interactively;
 do not place them in shell history.
@@ -1208,8 +1312,10 @@ do not place them in shell history.
 | Variable / 变量                      | Preview / 预览                        | Production / 生产            | Browser-visible / 浏览器可见 |
 | ------------------------------------ | ------------------------------------- | ---------------------------- | ---------------------------- |
 | `NEXT_PUBLIC_APP_URL`                | Stable preview URL after first deploy | Final HTTPS domain           | Yes / 是                     |
+| `NEXT_PUBLIC_DEPLOYMENT_TRACK`       | `production`                          | `production`                 | Yes / 是                     |
 | `NEXT_PUBLIC_SUPABASE_URL`           | Non-prod Supabase                     | Prod Supabase                | Yes / 是                     |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY`      | Non-prod anon key                     | Prod anon key                | Yes / 是                     |
+| `VEYRA_VERCEL_ENV`                   | `preview`                             | `production`                 | No / 否                      |
 | `SUPABASE_SERVICE_ROLE_KEY`          | Non-prod only                         | Prod only                    | **No / 否**                  |
 | `ADMIN_GOOGLE_EMAIL`                 | Test admin                            | Real admin                   | No / 否                      |
 | `STRIPE_MODE`                        | `test`                                | `live`                       | No / 否                      |
@@ -1223,25 +1329,86 @@ do not place them in shell history.
 | `DELIVERABLE_ALLOWED_HOSTS`          | Test hosts                            | Approved production hosts    | No / 否                      |
 | `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` | Preview-specific                      | Stable production key        | No / 否                      |
 
-中文说明：Preview 列必须使用非生产 Supabase、Stripe 测试密钥、测试管理员和独立
+中文说明：本生产手册中 Preview 与 Production 都必须把 deployment track 设置为
+`production`；Preview 仍使用非生产 Supabase、Stripe 测试密钥、测试管理员和独立
 Server Action 密钥；Production 列必须使用生产 Supabase、Stripe live 密钥、真实管理员、
-实际时区/货币和批准的交付域名。只有三个 `NEXT_PUBLIC_` 变量可进入浏览器；其余全部为
+实际时区/货币和批准的交付域名。只有四个 `NEXT_PUBLIC_` 变量可进入浏览器；其余全部为
 服务端密钥或业务配置。
+
+Do not create `VERCEL_ENV` yourself; Vercel supplies it. Do not derive
+`NEXT_PUBLIC_APP_URL` from the per-deployment `VERCEL_URL`. OAuth, cookies,
+Stripe returns, and webhooks use the explicit stable Preview or Production
+origin.
+
+不要手动创建 `VERCEL_ENV`，它由 Vercel 提供。不要用每次变化的 `VERCEL_URL` 派生
+`NEXT_PUBLIC_APP_URL`；OAuth、cookie、Stripe return 和 webhook 必须使用明确稳定的
+Preview 或 Production origin。
 
 After changing environment variables, create a new deployment. Existing
 deployments do not automatically receive new values.
 
 修改环境变量后必须重新部署；已有部署不会自动获得新值。
 
-Before the first preview URL exists, add every Preview variable except
-`NEXT_PUBLIC_APP_URL`, or temporarily use the expected stable Vercel project
-alias if it is already shown by `vercel link`. The first preview is a
-bootstrap deployment only; do not test OAuth until the exact URL is configured
-and a second preview has been deployed.
+Vercel Sensitive variables are write-only, so a local command cannot download
+and certify their remote values. If an operator has loaded an exact worksheet
+into a trusted shell, validate that shell before entering the values:
 
-首个 Preview URL 产生之前，先配置除 `NEXT_PUBLIC_APP_URL` 外的所有 Preview 变量；
-如果 `vercel link` 已显示稳定项目别名，也可临时使用该别名。第一次 Preview 仅用于
-获取 URL；在配置精确 URL 并完成第二次 Preview 部署之前，不要测试 OAuth。
+Vercel Sensitive 变量为 write-only，因此本地命令无法下载并认证其远程值。如果操作
+人员已把精确 worksheet 加载到可信 shell，可在录入 Vercel 前验证：
+
+```powershell
+npm run check:vercel:preview
+npm run check:vercel:production
+```
+
+These commands inspect only the current shell. The authoritative validator
+runs in `next.config.ts` during every Vercel remote source build, where
+Sensitive values are available. It checks exact HTTPS origins, distinct
+public/service keys within a scope, Google administrator email, Stripe
+mode/key/webhook consistency, 32-byte Base64 Server Action keys, timezone,
+currency, and deliverable hosts.
+
+这些命令只检查当前 shell。权威验证由每个 Vercel remote source build 中的
+`next.config.ts` 执行，此时可以访问 Sensitive 值。它会检查精确 HTTPS origin、同一
+scope 中不同的 public/service key、Google 管理员邮箱、Stripe mode/key/webhook
+一致性、32-byte Base64 Server Action key、时区、货币和交付 host。
+
+Because Vercel intentionally cannot reveal Sensitive values after creation,
+cross-scope secret equality cannot be audited locally. Before every release,
+manually compare the Dashboard scopes and the provider resource identifiers;
+record that Preview and Production use different origins, Supabase projects,
+Stripe Sandboxes/endpoints, and Server Action keys.
+
+由于 Vercel 创建 Sensitive 值后不会再显示它们，本地无法比较跨 scope 的 secret
+是否相同。每次发布前必须手动比较 Dashboard scope 和服务商 resource identifier，
+并记录 Preview 与 Production 使用不同 origin、Supabase project、Stripe
+Sandbox/endpoint 和 Server Action key。
+
+### Vercel request boundaries / Vercel 请求边界
+
+- Server Actions remain limited to 1 MB.
+- Server Actions 保持 1 MB 限制。
+- Images use `/api/uploads`, not a Server Action, and are limited to 4 MiB
+  plus bounded multipart overhead.
+- 图片通过 `/api/uploads` 而不是 Server Action，文件限制为 4 MiB，并加受控
+  multipart overhead。
+- `/api/*` is excluded from Next.js Proxy. Protected API routes authenticate
+  independently, avoiding Vercel Routing Middleware's 4 MB body limit.
+- `/api/*` 排除在 Next.js Proxy 外；受保护 API Route 自行认证，以避免 Vercel
+  Routing Middleware 的 4 MB body limit。
+- The upload route remains below Vercel Function's 4.5 MB request limit.
+- 上传 Route 保持低于 Vercel Function 4.5 MB request limit。
+- Stripe webhooks also bypass Proxy and preserve the raw signed body.
+- Stripe webhook 同样绕过 Proxy，并保留原始签名 body。
+
+Select and add the stable Preview alias before building. Set its exact HTTPS
+origin as `NEXT_PUBLIC_APP_URL`; the Vercel environment validator rejects a
+missing or temporary value. Do not use an immutable deployment URL for OAuth
+configuration.
+
+构建前先选择并添加稳定 Preview alias，并把其精确 HTTPS origin 设置为
+`NEXT_PUBLIC_APP_URL`；Vercel 环境验证器会拒绝缺失或临时值。OAuth 配置不得使用
+每次变化的 immutable deployment URL。
 
 ---
 
@@ -1254,15 +1421,6 @@ endpoint, or Preview environment variables change.
 bootstrap 与验证后的 Preview 已在 §8.6 创建。只有稳定 Preview alias、OAuth、
 Stripe 测试 endpoint 或 Preview 环境变量变化时，才重新执行本节。
 
-```powershell
-& $Vercel
-```
-
-Record the first immutable deployment URL. Assign it to the stable preview
-alias selected in §1:
-
-记录第一次不可变部署 URL，并把它绑定到 §1 选定的稳定 Preview alias：
-
 Before assigning an owned alias such as `preview.example.com`, add it to the
 Vercel project, add the required DNS record at the registrar, and wait for TLS
 validation:
@@ -1272,7 +1430,7 @@ validation:
 
 ```powershell
 & $Vercel domains add <STABLE_PREVIEW_ALIAS>
-& $Vercel alias set <FIRST_PREVIEW_DEPLOYMENT_URL> <STABLE_PREVIEW_ALIAS>
+& $Vercel alias set <PREVIEW_DEPLOYMENT_URL> <STABLE_PREVIEW_ALIAS>
 ```
 
 `STABLE_PREVIEW_ALIAS` should be an owned hostname such as
@@ -1281,10 +1439,20 @@ validation:
 `STABLE_PREVIEW_ALIAS` 应为自有稳定主机名，例如 `preview.example.com`，而不是
 不可变部署 URL。
 
-Update `NEXT_PUBLIC_APP_URL` in Vercel Preview to that stable alias. Add the
-exact origin and
-`/auth/callback` URL to the Preview Google client and Preview Supabase URL
-configuration. Create a Stripe test webhook at:
+The stable Preview domain must be publicly reachable for browser OAuth and
+Stripe webhooks. In Vercel Deployment Protection, add a domain exception or
+disable protection for this alias. Application authentication still protects
+private routes. A Stripe query-string bypass does not solve browser OAuth and
+must never be added to the OAuth callback.
+
+稳定 Preview 域名必须允许浏览器 OAuth 与 Stripe webhook 公开访问。应在 Vercel
+Deployment Protection 中为该 alias 添加 domain exception，或关闭其 protection。
+应用认证仍保护私有路由。Stripe query-string bypass 无法解决浏览器 OAuth，且绝不能
+加入 OAuth callback。
+
+Set `NEXT_PUBLIC_APP_URL` in Vercel Preview to that stable alias. Add the exact
+origin and `/auth/callback` URL to the Preview Google client and Preview
+Supabase URL configuration. Create a Stripe test webhook at:
 
 把 Vercel Preview 的 `NEXT_PUBLIC_APP_URL` 更新为该稳定 alias；将 origin 和
 `/auth/callback` 添加到 Preview Google 客户端及 Preview Supabase URL 配置；创建
@@ -1294,21 +1462,20 @@ Stripe 测试 webhook：
 https://YOUR_PREVIEW_DOMAIN/api/webhooks/stripe
 ```
 
-Set that test endpoint's `whsec_...` only in Vercel Preview, then deploy a
-second preview and repoint the stable alias:
+Set that test endpoint's `whsec_...` only in Vercel Preview, then validate,
+build, deploy, and point the stable alias at the new immutable deployment:
 
 仅在 Vercel Preview 设置该测试 endpoint 的 `whsec_...`，然后再次部署并重新绑定
 稳定 alias：
 
 ```powershell
-& $Vercel
-& $Vercel alias set <SECOND_PREVIEW_DEPLOYMENT_URL> <STABLE_PREVIEW_ALIAS>
+npm run vercel:deploy:preview
+& $Vercel alias set <PREVIEW_DEPLOYMENT_URL> <STABLE_PREVIEW_ALIAS>
 ```
 
-Confirm the second preview uses only non-production Supabase and Stripe test
-mode.
+Confirm the Preview uses only non-production Supabase and Stripe test mode.
 
-确认第二次 Preview 只使用非生产 Supabase 和 Stripe 测试模式。
+确认 Preview 只使用非生产 Supabase 和 Stripe 测试模式。
 
 Preview checks / 预览检查：
 
@@ -1740,10 +1907,36 @@ production-environment candidate **without assigning the production domain**:
 
 确认生产迁移和迁移后基线备份，然后创建一个**不绑定生产域名**的生产环境候选部署：
 
+Before running the command, review the signed pre-entry worksheet from §13.
+In the Dashboard, compare the visible scopes, origins, Supabase project URLs,
+and Stripe endpoint/account identifiers. Confirm the hidden Sensitive entries
+are present in only their intended scope; do not claim to reveal or compare
+their stored values.
+
+执行命令前复核 §13 的录入前签字 worksheet。在 Dashboard 中比较可见 scope、origin、
+Supabase project URL 和 Stripe endpoint/account identifier；确认隐藏的 Sensitive
+entry 只存在于预期 scope，不要声称能重新显示或比较其存储值。
+
 ```powershell
-$candidateUrl = & $Vercel deploy --prod --skip-domain
-$candidateUrl
-& $Vercel inspect $candidateUrl
+npm run vercel:deploy:candidate
+```
+
+The wrapper executes `vercel deploy --prod --skip-domain`; Vercel builds the
+uploaded source with its write-only Sensitive values. If the
+native CLI no longer accepts that option, the command fails rather than
+silently assigning the Production domain.
+
+wrapper 执行 `vercel deploy --prod --skip-domain`；Vercel 使用 write-only
+Sensitive 值远程构建源码。如果 native CLI 不再接受该参数，命令会失败，而不是静默
+绑定 Production 域名。
+
+Copy the exact URL printed by the deploy command, then inspect it:
+
+复制 deploy 输出中的精确 URL，然后检查：
+
+```powershell
+$candidateUrl = "https://EXACT-CANDIDATE.vercel.app"
+npm run vercel:inspect -- $candidateUrl
 ```
 
 Record:
@@ -1935,7 +2128,18 @@ $env:LOAD_TEST_URL = "https://YOUR_PREVIEW_DOMAIN"
 $env:LOAD_TEST_CONCURRENCY = "300"
 $env:LOAD_TEST_REQUESTS_PER_CLIENT = "3"
 $env:LOAD_TEST_TIMEOUT_MS = "30000"
-npm run load:http
+try {
+  npm run load:http
+  if ($LASTEXITCODE -ne 0) {
+    throw "HTTP load test failed."
+  }
+}
+finally {
+  Remove-Item Env:LOAD_TEST_URL -ErrorAction SilentlyContinue
+  Remove-Item Env:LOAD_TEST_CONCURRENCY -ErrorAction SilentlyContinue
+  Remove-Item Env:LOAD_TEST_REQUESTS_PER_CLIENT -ErrorAction SilentlyContinue
+  Remove-Item Env:LOAD_TEST_TIMEOUT_MS -ErrorAction SilentlyContinue
+}
 ```
 
 Required / 要求：
@@ -2643,7 +2847,7 @@ Confirm the exact candidate is still the signed-off deployment:
 ```powershell
 git status --porcelain
 git rev-parse HEAD
-& $Vercel inspect $candidateUrl
+npm run vercel:inspect -- $candidateUrl
 ```
 
 Promote it to the configured production domains:
@@ -2651,7 +2855,7 @@ Promote it to the configured production domains:
 把候选版本提升到生产域名：
 
 ```powershell
-& $Vercel promote $candidateUrl
+npm run vercel:promote -- $candidateUrl
 ```
 
 Immediately execute every applicable item in §21 against
@@ -2677,7 +2881,7 @@ If a critical test fails, stop announcements and immediately run:
 任何关键测试失败时，停止公告并立即执行：
 
 ```powershell
-& $Vercel rollback <LAST_KNOWN_GOOD_DEPLOYMENT_URL>
+npm run vercel:rollback -- https://LAST-KNOWN-GOOD.vercel.app
 ```
 
 If the failed release was the first deployment and no prior production
@@ -2716,3 +2920,22 @@ After every final smoke check passes:
 - `docs/payments.md` - Stripe workflow / Stripe 流程
 - `docs/operations.md` - Ongoing operations / 日常运维
 - `docs/ci-cd-plan.md` - Manual Actions and future CI/CD / 手动 Actions 与未来 CI/CD
+
+Official provider references / 官方服务商参考：
+
+- Vercel CLI deployment:
+  <https://vercel.com/docs/projects/deploy-from-cli>
+- Vercel environment variables:
+  <https://vercel.com/docs/environment-variables>
+- Vercel Function limits:
+  <https://vercel.com/docs/functions/limitations>
+- Vercel Routing Middleware:
+  <https://vercel.com/docs/routing-middleware>
+- Vercel Hobby commercial-use boundary:
+  <https://vercel.com/docs/limits/fair-use-guidelines#commercial-usage>
+- Supabase Google OAuth:
+  <https://supabase.com/docs/guides/auth/social-login/auth-google>
+- Supabase redirect URLs:
+  <https://supabase.com/docs/guides/auth/redirect-urls>
+- Stripe webhooks:
+  <https://docs.stripe.com/webhooks>

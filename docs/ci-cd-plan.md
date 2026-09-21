@@ -13,6 +13,9 @@ credentials.
 Dependabot, Vercel Git deployment, automated migrations, and scheduled jobs
 are not configured.
 
+`vercel.json` sets `git.deploymentEnabled=false`; Vercel deployments are
+created only through the reviewed manual `npm run vercel:*` workflow.
+
 ## Running the current workflow
 
 1. Open the repository on GitHub.

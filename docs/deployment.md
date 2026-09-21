@@ -7,14 +7,13 @@ the policies, enabled the required accounts, and completed local verification.
 For the complete English/Chinese step-by-step procedure, use
 `docs/deployment-bilingual.md`.
 
-For the zero-recurring-hosting-cost Netlify/Supabase MVP Demo track, use
+For the zero-recurring-hosting-cost Vercel Hobby/Supabase MVP Demo track, use
 `docs/deployment-free-bilingual.md`.
 
-The Vercel Pro architecture recommendation remains, but do not run bare
-`npx vercel`. The current reviewed CLI dependency tree contains unresolved
-high/critical advisories. Follow the isolated audit gate in
-`docs/deployment-bilingual.md`; if it cannot pass, use the free Netlify Demo
-track or wait for an audit-clean Vercel CLI release.
+The repository pins Vercel's official code-signed native CLI. The standard
+Node-based Vercel CLI is intentionally absent because its reviewed dependency
+tree contains unresolved high/critical advisories. Use only the
+`npm run vercel:*` commands documented below; do not run bare `npx vercel`.
 
 ## Cost and account prerequisites
 
@@ -149,21 +148,67 @@ records email as disabled and continues to use in-app notifications.
 
 ## 9. Create the Vercel project
 
-Create the project without connecting Git auto-deployment. Use only the
-isolated, audit-clean `$Vercel` CLI established in
-`docs/deployment-bilingual.md`.
+Confirm the pinned native CLI, log in, and link or create the project:
+
+```powershell
+npm run vercel:doctor
+npm run vercel:login
+npm run vercel:link
+```
+
+Create the project without Git auto-deployment. `vercel.json` explicitly sets
+`git.deploymentEnabled=false`, `installCommand=npm ci`, and
+`buildCommand=npm run build:vercel`. Enable Vercel's System Environment
+Variables and set `VEYRA_VERCEL_ENV=preview` in Preview and
+`VEYRA_VERCEL_ENV=production` in Production.
 
 Add the variables from `.env.example` separately for Preview and Production.
 Use only production Supabase and Stripe values in the Production environment.
 Protect every secret variable.
 
-The production build must not contact Stripe, send email, seed customer data,
-or require Docker.
+Vercel Sensitive variables are write-only and cannot be downloaded for a
+trustworthy local audit. If you have loaded an environment worksheet into the
+current trusted shell, validate it before entering the values in Vercel:
+
+```powershell
+npm run check:vercel:preview
+npm run check:vercel:production
+```
+
+The authoritative check runs in `next.config.ts` during each Vercel remote
+build, where Sensitive values are available. Manually compare the two
+Dashboard scopes and confirm different application origins, Supabase projects,
+Stripe Sandboxes/endpoints, and Server Action keys. The production build must
+not contact Stripe, send email, seed customer data, or require Docker.
 
 ## 10. Deploy manually
 
-Create the preview and production candidate only through that gated CLI,
-following the bilingual runbook's unpromoted-candidate procedure.
+Vercel always treats a new project's first deployment as Production. Configure
+the temporary test-only Production bootstrap from the bilingual runbook, then
+make the candidate command the first deployment:
+
+```powershell
+npm run vercel:deploy:candidate
+```
+
+The wrapper includes `--prod --skip-domain`, so this first deployment receives
+no production alias. After the bootstrap project exists, create Preview:
+
+```powershell
+npm run vercel:deploy:preview
+```
+
+Both commands upload source and build remotely so write-only Sensitive
+variables are present during validation. Before the final Production
+candidate, replace every temporary Production value with the real production
+scope and follow the full bilingual gate.
+
+Copy the exact candidate URL, inspect it, and promote it only after approval:
+
+```powershell
+npm run vercel:inspect -- https://CANDIDATE.vercel.app
+npm run vercel:promote -- https://CANDIDATE.vercel.app
+```
 
 Attach the custom domain, update DNS, and wait for HTTPS certificate
 provisioning. Update application, Supabase, Google, Stripe, and Resend origins

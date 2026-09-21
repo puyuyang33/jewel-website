@@ -68,6 +68,8 @@ See [Architecture](docs/architecture.md) and
 - npm 10 or newer.
 - Docker Desktop for local Supabase.
 - Supabase CLI, installed as a pinned project dependency.
+- Official code-signed native Vercel CLI, installed as a pinned development
+  dependency.
 - Chromium and WebKit for Playwright.
 - Stripe CLI for manual webhook smoke tests.
 
@@ -93,8 +95,10 @@ Never commit `.env.local` or any provider secret.
 | Variable                             | Visibility            | Purpose                                   |
 | ------------------------------------ | --------------------- | ----------------------------------------- |
 | `NEXT_PUBLIC_APP_URL`                | Browser-safe          | Exact application origin                  |
+| `NEXT_PUBLIC_DEPLOYMENT_TRACK`       | Browser-safe          | `production` or visible `free-demo` mode  |
 | `NEXT_PUBLIC_SUPABASE_URL`           | Browser-safe          | Supabase project URL                      |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY`      | Browser-safe          | Supabase anonymous key                    |
+| `VEYRA_VERCEL_ENV`                   | Server only           | Explicit Preview or Production target     |
 | `SUPABASE_SERVICE_ROLE_KEY`          | Server only           | Narrow privileged operations              |
 | `ADMIN_GOOGLE_EMAIL`                 | Server only           | Administrator bootstrap allowlist         |
 | `STRIPE_MODE`                        | Server only           | Explicit `test` or `live` provider mode   |
@@ -189,11 +193,15 @@ npm run test:integration
 npm run test:rls
 npm run test:e2e
 npm run build
+npm run demo:build
 npm run verify
 npm run verify:full
 npm run audit:dependencies
 npm run load:http
 npm run load:realtime
+npm run vercel:doctor
+npm run check:vercel:preview
+npm run check:vercel:production
 ```
 
 `verify` requires no production credentials and runs formatting, lint, strict
@@ -237,10 +245,45 @@ Deployment remains manual:
 4. Configure storage, Google OAuth, and administrator access.
 5. Configure Stripe test webhook and optional Resend.
 6. Create Vercel without Git auto-deployment.
-7. Add scoped environment variables.
-8. Deploy a preview manually.
-9. Run the production smoke checklist.
-10. Deploy production manually.
+7. Configure the build settings, System Environment Variables, and scoped
+   environment variables.
+8. Make the mandatory first deployment a temporary, unaliased Production
+   bootstrap with `vercel:deploy:candidate`.
+9. Deploy and validate Preview.
+10. Replace every temporary Production value with the real Production scope.
+11. Create and inspect a new unaliased Production candidate.
+12. Promote only after the final smoke checklist passes.
+
+The reviewed deployment commands are:
+
+```powershell
+npm run vercel:doctor
+npm run vercel:login
+npm run vercel:link
+npm run vercel:deploy:candidate
+npm run vercel:inspect -- https://CANDIDATE.vercel.app
+npm run vercel:deploy:preview
+npm run vercel:promote -- https://CANDIDATE.vercel.app
+```
+
+The first Vercel deployment is always a Production-environment deployment.
+Follow the detailed runbook's temporary test-only Production bootstrap and
+run `vercel:deploy:candidate` first; its `--skip-domain` flag prevents the
+production domain from being assigned.
+
+`vercel.json` disables Git-triggered deployments. The application uses the
+official pinned native Vercel CLI rather than the standard Node CLI dependency
+tree. It also forces `npm ci` and `npm run build:vercel`. Enable Vercel System
+Environment Variables and set `VEYRA_VERCEL_ENV=preview` in Preview and
+`VEYRA_VERCEL_ENV=production` in Production. The build fails if Vercel's
+`VERCEL_ENV` is missing or disagrees. Vercel performs the authoritative
+environment validation inside each remote build, including write-only
+Sensitive variables. The `check:vercel:*` commands validate only values
+explicitly loaded into the current trusted shell; they do not claim to read
+remote Sensitive values.
+
+`.vercelignore` excludes `.env*`, certificates, local build/test output,
+database files, and non-runtime documentation/tests from CLI source uploads.
 
 See [Manual Deployment](docs/deployment.md).
 
@@ -251,7 +294,8 @@ are in [Service Setup](docs/service-setup.md) and
 A complete step-by-step English/Chinese deployment runbook is available in
 [Bilingual Deployment Runbook](docs/deployment-bilingual.md).
 
-For a zero-recurring-cost MVP demonstration, use
+For a personal, non-commercial, zero-recurring-cost Vercel Hobby MVP
+demonstration, use
 [Zero-Cost MVP Demo / 完全免费 MVP Demo](docs/deployment-free-bilingual.md).
 
 ## GitHub Actions

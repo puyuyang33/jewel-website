@@ -33,6 +33,13 @@ limit is 4 MiB.
 Current central limits are defined in `src/config/limits.ts`. They must remain
 below current host and provider request limits.
 
+On Vercel, `/api/*` is excluded from the Next.js Proxy matcher. API routes
+perform their own authentication and authorization. This keeps image uploads
+away from Vercel Routing Middleware's 4 MB body limit while the upload Route
+Handler remains below the Vercel Function 4.5 MB request limit, including the
+bounded multipart overhead. Images are not uploaded through Server Actions;
+their separate 1 MB limit remains unchanged.
+
 ## Downloads
 
 Private references and drafts are opened through an authenticated route. The
