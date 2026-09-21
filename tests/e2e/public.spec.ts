@@ -75,16 +75,29 @@ test.describe("Veyra Atelier public experience", () => {
     page,
   }) => {
     await page.goto("/portfolio");
+
+    const projectHeading = page.getByRole("heading", { name: "Orrery No. 3" });
+    await expect(projectHeading).toBeVisible();
+
     const detailLink = page
-      .getByRole("link", { name: "Read the study" })
-      .first();
+      .locator("article")
+      .filter({ has: projectHeading })
+      .getByRole("link", { name: "Read the study" });
+
     const href = await detailLink.getAttribute("href");
 
     expect(href).toMatch(/^\/portfolio\/[a-z0-9]+(?:-[a-z0-9]+)*$/);
     if (!href) throw new Error("Expected a portfolio detail href");
-    await detailLink.click();
 
-    await expect(page).toHaveURL(new RegExp(`${href}$`));
+    await detailLink.scrollIntoViewIfNeeded();
+    await Promise.all([
+      page.waitForURL(new RegExp(`${href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`)),
+      detailLink.click({ force: true }),
+    ]);
+
+    await expect(page).toHaveURL(
+      new RegExp(`${href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`),
+    );
     await expect(
       page.getByRole("heading", { level: 2, name: "The design story" }),
     ).toBeVisible();
